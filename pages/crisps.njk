@@ -1,0 +1,77 @@
+---
+title: Crisp Review Template Generator
+layout: base
+permalink: crisps/index.html
+ratings: ['Texture', 'Authenticity', 'Flavour']
+---
+
+<!-- https://codepen.io/lsirivong/pen/nRNLYL -->
+<style>
+    .ratings {
+        font-size: 1.2em;
+        direction: rtl;
+        unicode-bidi: bidi-override;
+    }
+    .ratings > input {
+        display: none;
+    }
+
+    .ratings > input + label {
+        display: inline-block;
+        overflow: hidden;
+        text-indent: 9999px;
+        width: 1em;
+        white-space: nowrap;
+        cursor: pointer;
+    }
+
+    .ratings > input + label::before {
+        display: inline-block;
+        text-indent: -9999px;
+        content: "☆";
+        color: #888;
+    }
+
+    .ratings > input:checked ~ label:before {
+        color: var(--links);
+        content: "★";
+    }
+</style>
+
+<script>
+    function generate() {
+        const full = 5
+        const ratings = "{{ ratings }}".split(',')
+        let content = ''
+        ratings.forEach(r => {
+            const rating = parseInt(document.querySelector(`input[name="${r}-rating"]:checked`).value)
+            let stars = ''
+            for(var i = 0; i < rating; i++) {
+                stars += '★'
+            }
+            for(var i = 0; i < full - rating; i++) {
+                stars += '☆'
+            }
+            content += `- **${r}** ${stars}\n`
+            navigator.clipboard.writeText(content)
+            document.getElementById('generate').innerText = 'Copied to Clipboard!'
+        })
+    }
+</script>
+
+<form id="crisps">
+    {% for type in ratings %}
+    <div class="rating-block">
+        {{ type }}&nbsp;
+        <span class="ratings">
+            <input type="radio" id="{{type}}-rating-5" name="{{type}}-rating" value="5"><label for="{{type}}-rating-5">5</label>
+            <input type="radio" id="{{type}}-rating-4" name="{{type}}-rating" value="4"><label for="{{type}}-rating-4">4</label>
+            <input type="radio" id="{{type}}-rating-3" name="{{type}}-rating" value="3"><label for="{{type}}-rating-3">3</label>
+            <input type="radio" id="{{type}}-rating-2" name="{{type}}-rating" value="2"><label for="{{type}}-rating-2">2</label>
+            <input type="radio" id="{{type}}-rating-1" name="{{type}}-rating" value="1"><label for="{{type}}-rating-1">1</label>
+        </span>
+    </div>
+    {% endfor %}
+</form>
+
+<button id="generate" onclick="generate()">Generate</button>
